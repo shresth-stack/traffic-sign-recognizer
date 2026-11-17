@@ -1,0 +1,7 @@
+venv
+__pycache__
+data
+uploads
+train.py
+train_old.py
+*.pyc

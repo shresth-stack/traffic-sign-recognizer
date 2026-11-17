@@ -1,0 +1,6 @@
+REPOSITORY                       TAG         IMAGE ID      CREATED            SIZE
+localhost/traffic-sign-frontend  latest      8b65132717a3  50 minutes ago     64.5 MB
+<none>                           <none>      2a42668ce1b3  54 minutes ago     125 MB
+localhost/traffic-sign-backend   latest      02c2a21d5316  About an hour ago  2.35 GB
+docker.io/library/nginx          alpine      7cac34a4d72b  11 days ago        64.4 MB
+docker.io/library/python         3.12-slim   78976a69c067  12 days ago        124 MB

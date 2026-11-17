@@ -1,0 +1,17 @@
+[
+     {
+          "Name": "sign-db",
+          "Driver": "local",
+          "Mountpoint": "/home/shresth/.local/share/containers/storage/volumes/sign-db/_data",
+          "CreatedAt": "2026-11-17T07:32:17.901294614Z",
+          "Labels": {
+               "com.docker.compose.project": "traffic-sign-recognizer",
+               "io.podman.compose.project": "traffic-sign-recognizer"
+          },
+          "Scope": "local",
+          "Options": {},
+          "MountCount": 0,
+          "NeedsCopyUp": true,
+          "LockNumber": 0
+     }
+]

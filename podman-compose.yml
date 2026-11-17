@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Containerfile
+    image: traffic-sign-backend:latest
+    container_name: traffic-backend
+    networks:
+      - sign-net
+    volumes:
+      - sign-db:/app/data
+    environment:
+      - DB_PATH=/app/data/predictions.db
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Containerfile
+    image: traffic-sign-frontend:latest
+    container_name: traffic-frontend
+    ports:
+      - "8080:80"
+    networks:
+      - sign-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  sign-net:
+    name: sign-net
+    driver: bridge
+
+volumes:
+  sign-db:
+    name: sign-db

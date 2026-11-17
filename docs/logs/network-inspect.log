@@ -1,0 +1,25 @@
+[
+     {
+          "name": "sign-net",
+          "id": "c63c6163444eff765f8ecd3f316f195a6cd42bc0ad2ec9d385ee3d96237e3791",
+          "driver": "bridge",
+          "network_interface": "podman1",
+          "created": "2026-11-17T07:32:19.433966087Z",
+          "subnets": [
+               {
+                    "subnet": "10.89.0.0/24",
+                    "gateway": "10.89.0.1"
+               }
+          ],
+          "ipv6_enabled": false,
+          "internal": false,
+          "dns_enabled": true,
+          "labels": {
+               "com.docker.compose.project": "traffic-sign-recognizer",
+               "io.podman.compose.project": "traffic-sign-recognizer"
+          },
+          "ipam_options": {
+               "driver": "host-local"
+          }
+     }
+]

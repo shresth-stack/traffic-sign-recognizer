@@ -1,0 +1,79 @@
+podman-compose version: 1.0.6
+['podman', '--version', '']
+using podman version: 4.9.3
+** excluding:  set()
+podman build -f ./backend/Containerfile -t traffic-sign-backend:latest ./backend
+STEP 1/11: FROM docker.io/library/python:3.12-slim
+STEP 2/11: WORKDIR /app
+--> Using cache 9349c9068de7f29ecd8bd106088f5e2c3c075c7101f7d043ebd523dc47fbb99b
+--> 9349c9068de7
+STEP 3/11: RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
+--> Using cache 4b0bbc7ca14751d35a1f0f54099f1d181638f436706a9272df09eafe425ad08e
+--> 4b0bbc7ca147
+STEP 4/11: COPY requirements.txt .
+--> Using cache 840b80e292e160dd39864bdf5696ddfba82cf54bf305e616cebb3783f9fae023
+--> 840b80e292e1
+STEP 5/11: RUN pip install --no-cache-dir -r requirements.txt
+--> Using cache 5a6a728c75351fbd1037e69de406f250c728e83725bc79038a9bf3ac4701aa88
+--> 5a6a728c7535
+STEP 6/11: COPY app.py .
+--> Using cache a6790af9f1020d5882cf871e37caf3f26e0a7925f468d341749d01f5a52d667a
+--> a6790af9f102
+STEP 7/11: COPY model/ ./model/
+--> Using cache 6a315a7ad3a11d1d84394b805ce53c30fee09e4a3b15ade744e1a21c9dba09b1
+--> 6a315a7ad3a1
+STEP 8/11: RUN mkdir -p /app/data /app/uploads
+--> Using cache 6ad357ffff523aca788d0a16251312400765b2b59bb52f6bc362a3375e882b29
+--> 6ad357ffff52
+STEP 9/11: ENV TF_CPP_MIN_LOG_LEVEL=2
+--> Using cache 1a5f84c0ca4b52cd99f6f740995f47ae116b7d4036890cbdc85030df8af1c7ea
+--> 1a5f84c0ca4b
+STEP 10/11: EXPOSE 5000
+--> Using cache 2aad53081770fdabb0d4e34cedd23e8df188d532be8763f77b11b66d38b8d03c
+--> 2aad53081770
+STEP 11/11: CMD ["gunicorn", "-w", "1", "-b", "0.0.0.0:5000", "--timeout", "120", "app:app"]
+--> Using cache 02c2a21d53168f41fb7a02eb937fb0044bc7a6c0eafc756d74c68ebfc39203c4
+COMMIT traffic-sign-backend:latest
+--> 02c2a21d5316
+Successfully tagged localhost/traffic-sign-backend:latest
+02c2a21d53168f41fb7a02eb937fb0044bc7a6c0eafc756d74c68ebfc39203c4
+exit code: 0
+podman build -f ./frontend/Containerfile -t traffic-sign-frontend:latest ./frontend
+STEP 1/6: FROM docker.io/library/nginx:alpine
+Trying to pull docker.io/library/nginx:alpine...
+Getting image source signatures
+Copying blob sha256:b9c6ee6a30f8811636d7273be348906cf0e4e9725378dd54b7d4a3725538cad4
+Copying blob sha256:c7dfd64eeb02740cc41e9f32ad7f75781882d4c167b77427aa9615d1419c4515
+Copying blob sha256:881fc932939efef04ca120ad44bbd2c0917851eb247aa4995428afb1e80ede17
+Copying blob sha256:1abafee971b93c1ae05f03c35c6fb6e3376e75e6f16b590092a822b61ebf10b6
+Copying blob sha256:e011f124249bf1c4be27b3311c3b40cb90dd7737381af1c62b508020790b7bd5
+Copying blob sha256:a746bd1dc828f61bf43b775dcfecb9ded8a3d3b41789915fe135fa6b9fa85965
+Copying blob sha256:69d81d5522572d5b7abcc8f594ecbc4cf9bea72402675a419e8d7b516e4c3f14
+Copying blob sha256:da90db506dd5f2d604467c4dc38442534f74c9e76c1982df0c262e144bad7bc9
+Copying config sha256:7cac34a4d72be2539edd7d8732207e8ffc8268a0b6458e6491f9b7c3dc95a70d
+Writing manifest to image destination
+STEP 2/6: COPY index.html /usr/share/nginx/html/
+--> 4b0cb5663b1b
+STEP 3/6: COPY style.css /usr/share/nginx/html/
+--> 8fb7176878a9
+STEP 4/6: COPY script.js /usr/share/nginx/html/
+--> a4b9f59e2c91
+STEP 5/6: COPY nginx.conf /etc/nginx/conf.d/default.conf
+--> 365028ac76a2
+STEP 6/6: EXPOSE 80
+COMMIT traffic-sign-frontend:latest
+--> 8b65132717a3
+Successfully tagged localhost/traffic-sign-frontend:latest
+8b65132717a3ccaac337616509d4e6fee5e7b57c4b4d0b97e89b84762fb54741
+exit code: 0
+['podman', 'ps', '--filter', 'label=io.podman.compose.project=traffic-sign-recognizer', '-a', '--format', '{{ index .Labels "io.podman.compose.config-hash"}}']
+podman volume inspect sign-db || podman volume create sign-db
+['podman', 'volume', 'inspect', 'sign-db']
+['podman', 'network', 'exists', 'sign-net']
+podman run --name=traffic-backend -d --label io.podman.compose.config-hash=5e42dd8363376babb9a809018ac76931a2ad7bc5024be6cc4e40f95d7e205e2b --label io.podman.compose.project=traffic-sign-recognizer --label io.podman.compose.version=1.0.6 --label PODMAN_SYSTEMD_UNIT=podman-compose@traffic-sign-recognizer.service --label com.docker.compose.project=traffic-sign-recognizer --label com.docker.compose.project.working_dir=/mnt/d/Traffic-Sign-Recognizer --label com.docker.compose.project.config_files=podman-compose.yml --label com.docker.compose.container-number=1 --label com.docker.compose.service=backend -e DB_PATH=/app/data/predictions.db -v sign-db:/app/data --net sign-net --network-alias backend --restart unless-stopped traffic-sign-backend:latest
+46b2995aef68764e79455774e5d575719c0d30713ae261ec5234da73d21d2efe
+exit code: 0
+['podman', 'network', 'exists', 'sign-net']
+podman run --name=traffic-frontend -d --requires=traffic-backend --label io.podman.compose.config-hash=5e42dd8363376babb9a809018ac76931a2ad7bc5024be6cc4e40f95d7e205e2b --label io.podman.compose.project=traffic-sign-recognizer --label io.podman.compose.version=1.0.6 --label PODMAN_SYSTEMD_UNIT=podman-compose@traffic-sign-recognizer.service --label com.docker.compose.project=traffic-sign-recognizer --label com.docker.compose.project.working_dir=/mnt/d/Traffic-Sign-Recognizer --label com.docker.compose.project.config_files=podman-compose.yml --label com.docker.compose.container-number=1 --label com.docker.compose.service=frontend --net sign-net --network-alias frontend -p 8080:80 --restart unless-stopped traffic-sign-frontend:latest
+98e2a76f2695a5028a74c10379cf99ad5b90dff4fba2dc3dbd0d677a18617f50
+exit code: 0

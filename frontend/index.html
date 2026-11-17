@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic Sign Recognizer — AI-Powered CNN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Loading Spinner Overlay -->
+  <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">Processing…</p>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="15" stroke="#2563eb" stroke-width="2"/>
+            <circle cx="16" cy="16" r="10" fill="#2563eb" fill-opacity="0.15" stroke="#3b82f6" stroke-width="1.5"/>
+            <text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="#60a5fa" font-family="Inter,sans-serif">AI</text>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Traffic Sign Recognizer</h1>
+          <p class="header-subtitle">AI-Powered CNN Classification System</p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="meta-label">Course</span>
+        <span class="meta-value">21CSE216P — Linux &amp; Container Technologies</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN DASHBOARD ===== -->
+  <main class="dashboard">
+
+    <!-- Row 1: Model Status + Upload -->
+    <div class="dashboard-grid top-grid">
+
+      <!-- Model Status Card -->
+      <section class="card model-status-card" aria-label="Model Status">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="card-icon" aria-hidden="true">⚙️</span>
+            Model Status
+          </h2>
+          <span id="model-status-badge" class="status-badge badge-loading">Loading…</span>
+        </div>
+        <div class="card-body">
+          <div class="stat-grid">
+            <div class="stat-item">
+              <span class="stat-label">Accuracy</span>
+              <span id="model-accuracy" class="stat-value">—</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Classes</span>
+              <span id="model-classes" class="stat-value">—</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Architecture</span>
+              <span class="stat-value">CNN</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Framework</span>
+              <span class="stat-value">TensorFlow</span>
+            </div>
+          </div>
+          <div id="model-warning" class="model-warning hidden" role="alert">
+            ⚠️ Model not loaded. Please train the model first using <code>train.py</code>.
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="footer-label">Auto-refreshes every 30 s</span>
+          <button class="btn btn-ghost btn-sm" id="refresh-model-btn" title="Refresh model info">↺ Refresh</button>
+        </div>
+      </section>
+
+      <!-- Upload Card -->
+      <section class="card upload-card" aria-label="Upload Image">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="card-icon" aria-hidden="true">📤</span>
+            Upload Image
+          </h2>
+        </div>
+        <div class="card-body">
+          <!-- Drop Zone -->
+          <div
+            id="drop-zone"
+            class="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Drag and drop image here or click to select"
+          >
+            <input type="file" id="file-input" accept="image/*" class="file-input" aria-label="Select image file" />
+            <div id="drop-zone-content" class="drop-zone-content">
+              <div class="drop-icon" aria-hidden="true">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="8" width="40" height="32" rx="4" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4 3"/>
+                  <path d="M24 18v12M18 24l6-6 6 6" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <p class="drop-primary">Drag &amp; drop image here</p>
+              <p class="drop-secondary">or <span class="drop-link">browse files</span></p>
+              <p class="drop-hint">Supports: JPG, PNG, BMP, PPM — Max 10 MB</p>
+            </div>
+            <!-- Preview -->
+            <div id="preview-container" class="preview-container hidden">
+              <img id="image-preview" class="image-preview" alt="Preview of selected traffic sign image" />
+              <button class="preview-clear" id="clear-preview-btn" aria-label="Remove selected image">✕</button>
+            </div>
+          </div>
+
+          <button id="predict-btn" class="btn btn-primary btn-block" disabled>
+            <span class="btn-text">Predict Sign</span>
+            <span class="btn-spinner hidden" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+    </div><!-- /top-grid -->
+
+    <!-- Row 2: Results + History -->
+    <div class="dashboard-grid bottom-grid">
+
+      <!-- Results Card -->
+      <section class="card results-card" aria-label="Prediction Result">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="card-icon" aria-hidden="true">🎯</span>
+            Prediction Result
+          </h2>
+        </div>
+        <div class="card-body">
+          <div id="result-placeholder" class="result-placeholder">
+            <p>Upload an image and click <strong>Predict Sign</strong> to see results here.</p>
+          </div>
+
+          <div id="result-content" class="result-content hidden">
+            <div class="result-sign-box">
+              <div class="result-label-sm">Detected Sign</div>
+              <div id="result-class-name" class="result-class-name">—</div>
+            </div>
+
+            <div class="confidence-section">
+              <div class="confidence-header">
+                <span class="confidence-label">Confidence</span>
+                <span id="confidence-value" class="confidence-value">0%</span>
+              </div>
+              <div class="confidence-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="confidence-bar-track">
+                <div id="confidence-bar-fill" class="confidence-bar-fill" style="width:0%"></div>
+              </div>
+            </div>
+
+            <div class="result-meta">
+              <div class="result-meta-item">
+                <span class="result-meta-label">Timestamp</span>
+                <span id="result-timestamp" class="result-meta-value">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Card -->
+      <section class="card history-card" aria-label="Prediction History">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="card-icon" aria-hidden="true">📋</span>
+            Prediction History
+          </h2>
+          <button id="clear-history-btn" class="btn btn-danger btn-sm">🗑 Clear</button>
+        </div>
+        <div class="card-body history-body">
+          <div id="history-empty" class="history-empty hidden">
+            <p>No predictions yet. Upload an image to get started.</p>
+          </div>
+          <div class="history-table-wrap" id="history-table-wrap">
+            <table class="history-table" id="history-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Thumbnail</th>
+                  <th>Sign Name</th>
+                  <th>Confidence</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <!-- Rows inserted by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /bottom-grid -->
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <p>Traffic Sign Recognizer · CNN Capstone Project · 21CSE216P</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

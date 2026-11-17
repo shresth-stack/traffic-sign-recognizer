@@ -1,0 +1,10 @@
+{
+  "test_accuracy": 0.9478,
+  "test_loss": 0.2025,
+  "test_samples": 2910,
+  "train_samples": 10260,
+  "val_samples": 1500,
+  "num_classes": 10,
+  "epochs_run": 9,
+  "split_method": "by sign track (no track in both train and test)"
+}

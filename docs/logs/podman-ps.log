@@ -1,0 +1,3 @@
+CONTAINER ID  IMAGE                                   COMMAND               CREATED         STATUS         PORTS                 NAMES
+46b2995aef68  localhost/traffic-sign-backend:latest   gunicorn -w 1 -b ...  50 minutes ago  Up 50 minutes                        traffic-backend
+98e2a76f2695  localhost/traffic-sign-frontend:latest  nginx -g daemon o...  50 minutes ago  Up 50 minutes  0.0.0.0:8080->80/tcp  traffic-frontend
